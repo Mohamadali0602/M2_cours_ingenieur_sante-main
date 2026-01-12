@@ -1,0 +1,43 @@
+— id : identification du patient
+— tte : time to event : temps en semaines entre début du suivi du patient et l’event
+— times : temps en semaines entre début du suivi du patient et la visite du patient (prise
+des données)
+— label : event du patient (0 pour censure, 1 pour death, 2 pour transplant)
+— drug : prise de médicament ou non , 1 pour D-penicillamine ou 0 pour placebo
+— age : age du patient en années , calculée en divisant par 365 le nombre de jours entre la
+naissance de l’individu et son enregistrement pour l’étude
+— sex : sexe du patient , 0 pour femme et 1 pour homme
+— ascite : binaire, 1 pour la présence, 0 sinon. L’ascite est l’accumulation d’une trop grande
+quantité de liquide dans l’abdomen. Une couche de tissu appelée péritoine recouvre les
+organes abdominaux, notamment l’estomac, les intestins, le foie et les reins. Le péritoine
+est composé de deux couches. L’ascite se produit lorsque du liquide s’accumule entre les
+deux couches.
+— hepatomegaly : binaire, 1 pour l’hépatomégalie, 0 sinon. L’hépatomégalie est une hypertrophie
+du foie le rendant plus gonflé que sa taille normale.
+— spiders : binaire, 1 pour l’angiome d’araignée, 0 sinon. L’angiome d’araignée est une
+lésion vasculaire caractérisée par une dilatation anormale des vaisseaux sanguins de la
+peau.
+— edema : catégorielle, 0 pour absence d’oedème ou oedème minime ne nécesittant pas
+de traitement diurétique, 1 pour oedème modéré, défini comme un oedème pour lequel
+aucun traitement diurétique n’a été prescrit, et 2 pour oedème sevère, défini comme
+étant un oedème persistant malgré un traitement par des agents diurétiques.
+— serBilir : concentration de bilirubine dans le sang en mg/dl. La bilirubine est un pigment
+jaunâtre produit lors de la dégradation des globules rouges. Des taux plus élevés que la
+normal peuvent indiquer différents types de problèmes au niveau du foie ou des voies
+biliaires.
+— serChol : concentration de cholestérol dans le sang en mg/dl.
+— albumin : concentration d’albumin dans le sang en mg/dl. L’albumine est la protéine
+plasmatique la plus abondante. Chez les patients atteint d’une cirrhose avancée, les taux
+d’albumine sont faibles en raison d’une réduction de la masse des hépatocytes due à la
+maladie elle-même.
+— alkaline : taux de phosphatase alcaline en U/litre. La phosphatase alcaline est une
+enzyme produite par les cellules du foie et les voies biliaires, elle permet d’assurer le bon
+fonctionnement du foie.
+— SGOT : taux de SGOT en U/ml. La SGOT (Serum Glutamic Oxaloacetic Transaminase)
+est une enzyme présente dans le foie, c’est un indicateur de la santé du foie.
+— platelet : nombre de platelets par milimètre cubique (divisé par 1000).
+— prothrombin : temps de prothrombine en secondes. Le temps de prothrombine mesure
+le temps nécessaire à la formation d’un caillot dans un échantillon de sang.
+— histologic : catégorielle, stage histologique de la maladie, classé 1,2,3 où 4.
+- total_protein : Concentration de protéines (dont d'albumin) dans le sang en mg/dl.
+- date_diag : date au moment du diagnostic indiquant le début du suivi du patient.
