@@ -10,58 +10,44 @@ from clinical_cool_etud.prepa_data_model import build_lstm_tensor, split_tensors
 #from clinical_cool_etud.sksurv_format import to_sksurv_format
 
 
-def concordance_index(y_true, risk_scores):
+def manual_concordance_index(y_true, risk_matrix):
     """
-    Calculate the C-index (Concordance Index) for survival analysis.
+    Calculate the time-dependent C-index for survival analysis.
     
     Args:
-        y_true: Tensor of shape (n_samples, 2) where:
+        y_true: Array of shape (n_samples, 2) where:
                 - y_true[:, 0] = time to event
                 - y_true[:, 1] = event indicator (1 = event occurred, 0 = censored)
-        risk_scores: Tensor of shape (n_samples,) with predicted risk scores
+        risk_matrix: Array of shape (n_samples, n_time_points) with cumulative risk scores
     
     Returns:
         c_index: Float value between 0 and 1 (higher is better)
     """
-    # Convert to numpy if needed
-    if torch.is_tensor(y_true):
-        y_true = y_true.detach().cpu().numpy()
-    if torch.is_tensor(risk_scores):
-        risk_scores = risk_scores.detach().cpu().numpy()
-    
     times = y_true[:, 0]
     events = y_true[:, 1]
-    
+    concordant_pairs = 0
+    total_comparable_pairs = 0
     n = len(times)
-    concordant = 0
-    permissible = 0
     
-    # For each pair of samples
     for i in range(n):
-        for j in range(i + 1, n):
-            # Only consider pairs where at least one has an event
-            # Case 1: i has event and occurs before j
-            if events[i] == 1 and times[i] < times[j]:
-                permissible += 1
-                # Check if risk scores agree (higher risk should have lower survival time)
-                if risk_scores[i] > risk_scores[j]:
-                    concordant += 1
-                elif risk_scores[i] == risk_scores[j]:
-                    concordant += 0.5
+        if events[i] == 1:  # Patient i died
+            t_i = int(times[i])
+            # Ensure we don't go out of bounds in the risk matrix
+            t_idx = min(t_i, risk_matrix.shape[1] - 1)
             
-            # Case 2: j has event and occurs before i
-            elif events[j] == 1 and times[j] < times[i]:
-                permissible += 1
-                # Check if risk scores agree
-                if risk_scores[j] > risk_scores[i]:
-                    concordant += 1
-                elif risk_scores[i] == risk_scores[j]:
-                    concordant += 0.5
+            for j in range(n):
+                if times[j] > times[i]:  # j survived longer than i
+                    total_comparable_pairs += 1
+                    # Compare risks at time t_i
+                    risk_i = risk_matrix[i, t_idx]
+                    risk_j = risk_matrix[j, t_idx]
+                    
+                    if risk_i > risk_j:
+                        concordant_pairs += 1
+                    elif risk_i == risk_j:
+                        concordant_pairs += 0.5
     
-    if permissible == 0:
-        return 0.5  # Random performance if no valid pairs
-    
-    return concordant / permissible
+    return concordant_pairs / total_comparable_pairs if total_comparable_pairs > 0 else 0
 
 
 def main():
@@ -118,22 +104,35 @@ def main():
         epoch_loss = 0.0
 
         for X_batch, Y_batch in train_loader:
+            # Always reset gradients before each step
             optimizer.zero_grad()
+            
+            # Model outputs risk probabilities for each time point
             risk_death_predict = model(X_batch)
+            
+            # Calculate the negative log likelihood loss
             loss = criterion(risk_death_predict, Y_batch)
+            
+            # Backpropagation to calculate gradients
             loss.backward()
+            
+            # Optimize weights
             optimizer.step()
+            
+            # Add batch loss to epoch loss
             epoch_loss += loss.item()
 
-        history_loss.append(epoch_loss / len(train_loader))
+        # Calculate mean loss over the entire epoch
+        epoch_loss /= train_dataset.__len__()
+        history_loss.append(epoch_loss)
         
-        # Calculate C-index on training set every epoch
+        # Calculate time-dependent C-index on training set every epoch
         model.eval()
         with torch.no_grad():
-            train_risk_scores = model(X_train)
-            # Sum the risk scores over time to get overall risk
-            train_risk_total = train_risk_scores.sum(dim=1)
-            train_cindex = concordance_index(Y_train, train_risk_total)
+            train_probs = model(X_train)
+            # Calculate cumulative risk: Matrix [n_patients, n_time_points]
+            train_risk_cumulative = torch.cumsum(train_probs, dim=1).numpy()
+            train_cindex = manual_concordance_index(Y_train.numpy(), train_risk_cumulative)
             history_train_cindex.append(train_cindex)
         model.train()
         
@@ -143,16 +142,18 @@ def main():
     # Final evaluation on test set
     model.eval()
     with torch.no_grad():
-        test_risk_scores = model(X_test)
-        test_risk_total = test_risk_scores.sum(dim=1)
-        test_cindex = concordance_index(Y_test, test_risk_total)
+        # Test set
+        test_probs = model(X_test)
+        test_risk_cumulative = torch.cumsum(test_probs, dim=1).numpy()
+        test_cindex = manual_concordance_index(Y_test.numpy(), test_risk_cumulative)
         
-        train_risk_scores = model(X_train)
-        train_risk_total = train_risk_scores.sum(dim=1)
-        final_train_cindex = concordance_index(Y_train, train_risk_total)
+        # Train set (final)
+        train_probs = model(X_train)
+        train_risk_cumulative = torch.cumsum(train_probs, dim=1).numpy()
+        final_train_cindex = manual_concordance_index(Y_train.numpy(), train_risk_cumulative)
     
-    print(f"\nFinal Training C-index: {final_train_cindex:.4f}")
-    print(f"Test C-index: {test_cindex:.4f}")
+    print(f"\nFinal Training C-index (time-dependent): {final_train_cindex:.4f}")
+    print(f"Test C-index (time-dependent): {test_cindex:.4f}")
 
     # Plotting
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
@@ -176,8 +177,6 @@ def main():
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"\nPlot saved to: {output_path}")
     
-    plt.show()
-    
     # Save training history to CSV
     history_df = pd.DataFrame({
         'epoch': range(1, number_epochs + 1),
@@ -192,6 +191,7 @@ def main():
     results_summary = {
         'final_train_cindex': final_train_cindex,
         'test_cindex': test_cindex,
+        'mean_loss': np.mean(history_loss),
         'final_loss': history_loss[-1],
         'number_epochs': number_epochs
     }
