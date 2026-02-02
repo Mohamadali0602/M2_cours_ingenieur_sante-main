@@ -287,27 +287,6 @@ h_t = GRU(x_aug, h_decayed)
    - Decay parameters need tuning
    - Current implementation uses learned decay (not fixed)
 
-### Future Improvements
-
-#### Phase 1: Optimization
-- [ ] Grid search on hidden size (32, 64, 128)
-- [ ] Learning rate scheduling
-- [ ] Early stopping with patience
-- [ ] Cross-validation (5-fold)
-
-#### Phase 2: Advanced Features
-- [ ] Attention mechanism for interpretability
-- [ ] Multi-task learning (predict multiple outcomes)
-- [ ] Ensemble with LSTM and GRU-D
-
-#### Phase 3: Clinical Validation
-- [ ] External validation on new PBC dataset
-- [ ] Subgroup analysis (e.g., by treatment)
-- [ ] Survival curves visualization
-- [ ] Individual patient risk trajectories
-
----
-
 ## Conclusions
 
 ### Summary of Achievements
@@ -339,17 +318,9 @@ This implementation demonstrates:
 
 1. **Che et al. (2018)** - Recurrent Neural Networks for Multivariate Time Series with Missing Values. *Scientific Reports*, Nature.
    - Original GRU-D paper
-   - https://doi.org/10.1038/s41598-018-24271-9
-
-2. **Hochreiter & Schmidhuber (1997)** - Long Short-Term Memory. *Neural Computation*.
-   - Original LSTM architecture
-
-3. **Harrell et al. (1982)** - Evaluating the Yield of Medical Tests. *JAMA*.
-   - Concordance index for survival analysis
 
 ---
 
 **Project**: Master 2 - AI and Language Engineering in Health Sciences  
 **Author**: Mohamad Ali  
 **Date**: February 2, 2026  
-**Status**: ✅ Implementation Complete & Validated

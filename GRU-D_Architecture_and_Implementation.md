@@ -973,42 +973,7 @@ plt.show()
 - **Rapid deterioration:** GRU-D predicts **higher risk earlier** (steeper curve)
 - **Slow progression:** Both models similar, GRU-D slightly more conservative
 
----
-
-## 8. Implementation Roadmap
-
-### Phase 1: Data Preparation (Week 1)
-- [ ] Modify data loading to preserve missing values
-- [ ] Implement `build_grud_tensor()` function
-- [ ] Validate time gap calculations
-- [ ] Test mask generation
-
-### Phase 2: Model Implementation (Week 2)
-- [ ] Implement `GRU_D_risk_estimator` class
-- [ ] Test decay mechanisms
-- [ ] Verify gradient flow
-- [ ] Add dropout and regularization
-
-### Phase 3: Training (Week 3)
-- [ ] Adapt training loop for 3-tensor input
-- [ ] Implement early stopping
-- [ ] Add learning rate scheduler
-- [ ] Cross-validation
-
-### Phase 4: Evaluation (Week 4)
-- [ ] Compare LSTM vs. GRU-D on all metrics
-- [ ] Analyze prediction differences
-- [ ] Generate visualizations
-- [ ] Statistical significance testing
-
-### Phase 5: Hyperparameter Tuning (Week 5)
-- [ ] Grid search: hidden size, dropout, learning rate
-- [ ] Test different decay parameterizations
-- [ ] Optimize batch size and epochs
-
----
-
-## 9. Expected Challenges and Solutions
+## 8. Expected Challenges and Solutions
 
 ### Challenge 1: Computational Cost
 
@@ -1045,7 +1010,7 @@ keep_features = missing_rate < 0.8
 
 ---
 
-## 10. Summary
+## 9. Summary
 
 ### Key Takeaways
 
@@ -1064,16 +1029,9 @@ keep_features = missing_rate < 0.8
 3. **Clinical Utility:** Identify high-risk patients **earlier and more accurately**
 4. **Robustness:** Better handle real-world data with irregular visits and missing values
 
-### Next Steps
-
-1. **Start with `prepa_data_grud.py`** - Ensure time gaps are calculated correctly
-2. **Implement `model_grud.py`** - Test decay mechanism in isolation
-3. **Run `training_grud.py`** - Compare side-by-side with LSTM
-4. **Analyze results** - Focus on which patients GRU-D predicts differently
-
 ---
 
-## 11. References
+## 10. References
 
 1. **Che et al. (2018)** - Recurrent Neural Networks for Multivariate Time Series with Missing Values. *Scientific Reports*, Nature.
 
