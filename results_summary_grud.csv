@@ -1,0 +1,2 @@
+model,final_train_cindex,test_cindex,generalization_gap,mean_loss,final_loss,number_epochs,hidden_size,dropout
+GRU-D,0.9863857374392221,0.8328792007266121,0.15350653671260994,2.2273753845643807,0.7658506876014801,100,64,0.2
